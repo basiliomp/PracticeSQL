@@ -1,0 +1,48 @@
+id,name,gender,nacionality,age
+0,George Boole,M,British,25
+1,Galileo Galilei,M,Italian,45
+2,Alan Turing,M,British,43
+3,John Nash,M,American,36
+4,Pythagoras,M,Greek,45
+5,Euclides,M,Greek,34
+6,Ada Lovelace,F,British,23
+7,Rene Descartes,M,French,34
+8,Archimedes,M,Greek,34
+9,Nicolaus Copernicus,M,German,26
+10,Charles Babbage,M,British,34
+11,Johannes Kepler,M,German,23
+12,John von Neumann,M,Hungarian,24
+13,Blaise Pascal,M,French,21
+14,Erastothenes,M,Greek,22
+15,Leonhard Euler,M,Swiss,23
+16,Al-Khwarizmi,M,Persian,19
+17,Christiaan Huygens,M,Dutch,18
+18,Kurt Godel,M,American,18
+19,David Hilbert,M,German,19
+20,Pierre-Simon Laplace,M,French,19
+21,Henri Poincare,M,French,17
+22,Lord Kelvin,M,British,24
+23,Bernhard Riemann,M,German,19
+24,Daniel Bernoulli,M,Swiss,23
+25,Pierre de Fermat,M,French,35
+26,Joseph Fourier,M,French,28
+27,Evariste Galois,M,French,19
+28,Georg Ohm,M,German,35
+29,Augustin-Louis Cauchy,M,French,26
+30,Anders Celsius,M,Swedish,41
+31,Sophie Germain,F,French,31
+32,Jacob Bernoulli,M,Swiss,32
+33,Johann Bernoulli,M,Swiss,22
+34,Peter Gustav Lejeune Dirichlet,M,German,25
+35,Leonardi Fibonacci,M,Italian,29
+36,Carl Friederich Gauss,M,German,26
+37,Andre Marie Ampere,M,French,27
+38,Gottfried Leibniz,M,German,18
+39,Klara Dan von Neumann,F,Hungarian,19
+40,Adele Goldstine,F,American,25
+41,Grace Hopper,F,American,22
+42,Margaret Hamilton,F,American,23
+43,Linux Torvalds,M,Finnish,21
+44,Richard Stallman,M,American,25
+45,Dennis Ritchie,M,American,19
+46,Tim Berners-Lee,M,American,20
