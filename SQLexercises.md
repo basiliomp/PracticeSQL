@@ -30,13 +30,21 @@ Once you shut your computer down, the docker docks will be turned off. Hence, yo
 
 For that, run the following SQL commands for creating each of the tables:
 **Table people**
-`CREATE TABLE people (id INT, name VARCHAR (30), gender VARCHAR (1), nacionality VARCHAR (30), age INT, PRIMARY KEY (id));`
+```sql
+CREATE TABLE people (id INT, name VARCHAR (30), gender VARCHAR (1), nacionality VARCHAR (30), age INT, PRIMARY KEY (id));
+```
 **Table studies**
-`CREATE TABLE studies (student_id INT, subject_id INT, year INT, mark INT, PRIMARY KEY (student_id, subject_id));`
+```sql
+CREATE TABLE studies (student_id INT, subject_id INT, year INT, mark INT, PRIMARY KEY (student_id, subject_id));
+```
 **Table subjects**
-`CREATE TABLE subjects (id INT, name VARCHAR (30), credits INT, field VARCHAR (10), PRIMARY KEY (id) );`
+```sql
+CREATE TABLE subjects (id INT, name VARCHAR (30), credits INT, field VARCHAR (10), PRIMARY KEY (id) );
+```
 **Table teaches**
-`CREATE TABLE teaches (teacher_id INT, subject_id INT, year INT, PRIMARY KEY (teacher_id, subject_id));`
+```sql
+CREATE TABLE teaches (teacher_id INT, subject_id INT, year INT, PRIMARY KEY (teacher_id, subject_id));
+```
 
 Then, in this toy example, we need to upload the data (csv files) manually with the 'import' button at the top.
 
@@ -45,10 +53,10 @@ Then, in this toy example, we need to upload the data (csv files) manually with 
 1. What are the primary keys of each table?
 We can check it at the user interface (UI) because the table shows a yellow key along the name of that variable that is the primary key.
 Another way to do that is using the command
-`DESCRIBE table;`
+`DESCRIBE table;```
 
 2. Que asignaturas hay?
-`SELECT name FROM subjects;`
+`SELECT name FROM subjects;```
 
 3. Que campos (ramas) hay en el master?
 `SELECT DISTINCT field FROM subjects`
@@ -76,8 +84,9 @@ SELECT
 ```
 
 8. En cuantas asignaturas participa cada profesor?
+```sql
 SELECT 
-
+```
 9. Cual es la asignatura con mas matriculas registradas?
 ```sql
 SELECT ss.subject_id, s.name, COUNT (*) AS n_students
@@ -87,33 +96,75 @@ SELECT ss.subject_id, s.name, COUNT (*) AS n_students
 	ORDER BY n_students DESC;
 ```
 10. Quien es el alumno matriculado en mas asignaturas?
-SELECT 
+```sql
+-- Good solution
 
+-- Subquery method
+SELECT new_studies.student_id COUNT (*) AS n_subjects
+	FROM (SELECT DISTINCT ss.student_id, ss.subject_id FROM Studies ss) AS new_studies
+	JOINpeople p ON p.id = new_studies.student_id
+	GROUP BY new_studies.student_id
+	ORDER BY n_subjects DESC
+
+SELECT ss.student_id, COUNT(*) AS n_registers
+	FROM Studies ss
+	JOIN people p ON p.id = ss.student_id
+	GROUP BY ss.student_id
+	ORDER BY n_registers DESC LIMIT 1;
+
+-- Proposed solution:
+SELECT ss.student_id, COUNT(*) AS n_registers
+	FROM Studies ss
+	JOIN people p ON p.id = ss.student_id
+	GROUP BY ss.student_id
+	ORDER BY n_registers DESC LIMIT 1;
+```
 11. Quien es el alumno matriculado en mas creditos?
+```sql
 SELECT 
+```
 
 12. Cual es la nacionalidad mas repetida entre los profesores?
+```sql
 SELECT 
+``` 
 
 13. Cual es la edad media de los alumnos de "Data mining"?
+```sql
 SELECT 
+```
 
 14. Cual es la nota media en "Algebra"?
+```sql
 SELECT 
+```
 
 15. Cual es la nota media en las asignaturas de "cs" (Computer science)?
+```sql
 SELECT 
+```
 
 16. Cual es la nota media en las asignaturas de "mat" (Mathematics) entre los aprobados?
-SELECT 
+```sql
+SELECT
+```
+
 17. Quien es el/la alumno/a con mejor nota media?
+```sql
 SELECT 
+```
 
 18. Sabiendo que un credito vale 30 EUR, cuanto ha ganado la academia cada anyo?
+```sql
 SELECT 
+```
 
 19. Que asignaturas estan monopolizadas? (solo un profesor en la asignatura)
+```sql
 SELECT 
+```
 
 20. Si los profesores ganan un 30% de los creditos que imparten, cuanto hay que pagar a cada uno?
+```sql
 SELECT 
+```
