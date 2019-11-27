@@ -212,6 +212,7 @@ SELECT p.name, COUNT(DISTINCT s.subject_id) AS n_subjects
 ```
 Pierre-Simon Laplace and Christiaan Huygens, both with 9 subjects.
 
+```sql
 -- Subquery method
 SELECT new_studies.student_id COUNT (*) AS n_subjects
 	FROM (SELECT DISTINCT ss.student_id, ss.subject_id FROM Studies ss) AS new_studies
@@ -300,6 +301,7 @@ SELECT s1.name, AVG(s2.mark) AS average_grade
     GROUP BY s1.name;
 ```
 With the following result:
+
 | name | average_grade |
 |----------------------|---------------|
 | Intro to programming | 5.3889 |
