@@ -1,11 +1,12 @@
 # First steps with MySQL
 
-## Set up
-[Instructions](https://medium.com/@migueldoctor/run-mysql-phpmyadmin-locally-in-3-steps-using-docker-74eb735fa1fc)
+## Set up 
 
+[Instructions](https://medium.com/@migueldoctor/run-mysql-phpmyadmin-locally-in-3-steps-using-docker-74eb735fa1fc)
+True
 1. **Install docker**. This is feasible for MacOS, Linux distributions and Windows 10 Professional. If your system is not compatible, install additional software. For example in Windows 10 Home, install and run WAMP. Then access phpAdmin at the url:
 [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/).
-
+"sdsdsd"
 2. From terminal, run the following commands:
 ```bash
 	docker pull mysql:8.0.1
@@ -20,9 +21,12 @@
 
 [http://localhost/phpmyadmin/server_sql.php](http://localhost/phpmyadmin/server_sql.php)
 
-Once you shut your computer down, the docker docks will be turned off. Hence, you need to build those docks up again! For that, rerun the following commands from bash:
+Once you shut your computer down, the docker docks will be turned off. Hence, you need to build those docks up again! For that, rerun the following commands from bash. Note that the remove command needs the container id of to run:
 
 ```bash
+	docker ps -a	
+	docker rm 2ed8b04dc463
+	docker rm ff87492168ef
 	docker run --name my-own-mysql -e MYSQL_ROOT_PASSWORD=mypass123 -d mysql:8.0.1
 	docker run --name my-own-phpmyadmin -d --link my-own-mysql:db -p 8081:80 phpmyadmin/phpmyadmin
 	docker ps -a
@@ -121,63 +125,97 @@ SELECT * FROM people p
 ```
 If nothing is specified about the JOIN, it will be executed as an inner join (that is the case above).
 
-
-
 ## Questions to solve using SQL:
 
 1. What are the primary keys of each table?
 We can check it at the user interface (UI) because the table shows a yellow key along the name of that variable that is the primary key.
-Another way to do that is using the command
+Another way to do that is using the following command with each table:
 ```DESCRIBE table;```
 
-2. Que asignaturas hay?
-```SELECT name FROM subjects;```
+2. What are the subjects registered?
+```SELECT DISTINCT (name) FROM subjects;```
 
-3. Que campos (ramas) hay en el master?
+3. Which fields are taught?
 ```SELECT DISTINCT field FROM subjects```
 
-4. En que asignaturas da clase Grace Hopper?
+4. Which subject is taught by Grace Hopper?
 ```sql
-SELECT DISTINCT s.name 
-	FROM people p
-	JOIN teaches t ON p.id = t.teacher_id
-	JOIN subjects s ON s.id = t.subject_id
-	WHERE p.name = 'Grace Hopper';	
+SELECT p.name, s.name
+    FROM people as p
+    JOIN teaches as t ON p.id = t.teacher_id 
+    JOIN subjects as s ON t.subject_id = s.id
+    WHERE p.name = 'Grace Hopper';
 ```
-5. Quienes son los profesores de la asignatura "Compilers"?
+5. Who are the teacher for the subject 'Compilers'?
 ```sql
-SELECT 
+SELECT y.year, p.name
+	FROM people as p
+    LEFT JOIN teaches as t ON p.id = t.teacher_id
+    LEFT JOIN subjects as s ON t.subject_id = s.id
+    WHERE s.name = 'Compilers'
 ```
-6. Quienes son los profesores de la academia?
+There were Grace Hooper in 2016 and Dennis Richtie in 2017.
+
+6. Who are the teachers at this centre? (Answer for last year in database).
 ```sql
-SELECT 
+SELECT DISTINCT t.year, p.name
+    FROM people as p
+    LEFT JOIN teaches as t ON p.id = t.teacher_id
+    WHERE t.year = (SELECT MAX(year) FROM teaches)
 ```
 
-7. Cuantos son los profesores de la academia?
+7. How many teachers work at this centre? (Answer for last year in database)
 ```sql
-SELECT 
+SELECT COUNT(DISTINCT p.name)
+    FROM people as p
+    LEFT JOIN teaches as t ON p.id = t.teacher_id
+    WHERE t.year = (SELECT MAX(year) FROM teaches)
 ```
+10 in 2017.
 
-8. En cuantas asignaturas participa cada profesor?
+8. How many subjects are related to each teacher? 
 ```sql
-SELECT 
+SELECT teacher_id, COUNT(subject_id) AS n_subjects
+	FROM teaches
+    WHERE year = 2017
+    GROUP BY(teacher_id)
+    ORDER BY n_subjects DESC
 ```
-9. Cual es la asignatura con mas matriculas registradas?
+9. What is the subject with more students registered?
 ```sql
-SELECT ss.subject_id, s.name, COUNT (*) AS n_students
-	FROM studies ss
-	JOIN subject s ON s.id = ss.subject_id
-	GROUP BY ss.subject_id
-	ORDER BY n_students DESC;
+SELECT s1.name, COUNT(DISTINCT s2.student_id) AS n_students
+	FROM subjects AS s1
+    LEFT JOIN studies AS s2
+    ON s1.id = s2.subject_id
+    GROUP BY s1.name
+    ORDER BY n_students DESC
+    LIMIT 3;
+
+Advanced programming with 20 students in 2017.
+
+--SELECT ss.subject_id, s.name, COUNT (*) AS n_students
+--	FROM studies ss
+--	JOIN subject s ON s.id = ss.subject_id
+--	GROUP BY ss.subject_id
+--	ORDER BY n_students DESC;
 ```
-10. Quien es el alumno matriculado en mas asignaturas?
+10. Who is the student signed up for more subjects?
 ```sql
 -- Good solution
+SELECT p.name, COUNT(DISTINCT s.subject_id) AS n_subjects
+	FROM people AS p
+    LEFT JOIN studies AS s
+    ON p.id = s.student_id
+    GROUP BY p.name
+    ORDER BY n_subjects DESC
+    LIMIT 3
+```
+Pierre-Simon Laplace and Christiaan Huygens, both with 9 subjects.
 
 -- Subquery method
 SELECT new_studies.student_id COUNT (*) AS n_subjects
 	FROM (SELECT DISTINCT ss.student_id, ss.subject_id FROM Studies ss) AS new_studies
-	JOINpeople p ON p.id = new_studies.student_id
+	JOIN people p ON p.id = new_studies.student_id
 	GROUP BY new_studies.student_id
 	ORDER BY n_subjects DESC
 
@@ -194,30 +232,84 @@ SELECT ss.student_id, COUNT(*) AS n_registers
 	GROUP BY ss.student_id
 	ORDER BY n_registers DESC LIMIT 1;
 ```
-11. Quien es el alumno matriculado en mas creditos?
+11. Who is the student registered with more credit hours?
 ```sql
-SELECT 
+SELECT p.name, SUM(s2.credits) AS n_credits
+	FROM people AS p
+    LEFT JOIN studies AS s
+    ON p.id = s.student_id
+    LEFT JOIN subjects AS s2
+    ON s.subject_id = s2.id
+    GROUP BY p.name
+    ORDER BY n_credits DESC
+    LIMIT 1
 ```
+Christiaan Huygens with 135 credits.
 
-12. Cual es la nacionalidad mas repetida entre los profesores?
+12. What is the most frequent nationality among teachers?
 ```sql
-SELECT 
+SELECT p.nationality
+	FROM people AS p
+    INNER JOIN teaches AS t
+    ON p.id = t.teacher_id
+    GROUP BY p.nationality
+    ORDER BY p.nationality DESC
+    LIMIT 3 
 ``` 
+Swiss
 
-13. Cual es la edad media de los alumnos de "Data mining"?
+13. What is the average age of people studying "Data mining"?
 ```sql
-SELECT 
+SELECT AVG(p.age) AS avg_age
+	FROM people AS p
+    INNER JOIN studies AS s1
+    ON p.id = s1.student_id
+    INNER JOIN subjects AS s2
+    ON s1.subject_id = s2.id
+    WHERE s2.name = 'Data mining'
 ```
+25.9 years.
 
-14. Cual es la nota media en "Algebra"?
+14. What is the average grade in "Algebra"?
 ```sql
-SELECT 
+SELECT AVG(s2.mark)
+	FROM subjects AS s1
+    JOIN studies AS s2
+    ON s1.id = s2.subject_id
+    WHERE s1.name = "Algebra"
 ```
+5.8
 
 15. Cual es la nota media en las asignaturas de "cs" (Computer science)?
 ```sql
-SELECT 
+SELECT AVG(s2.mark)
+	FROM subjects AS s1
+    JOIN studies AS s2
+    ON s1.id = s2.subject_id
+    WHERE s1.field = "cs" 
 ```
+For the total ofsubjects in that field, the average grade is 6.5.
+
+If we want to know the average grade for *each* subject in the Computer Science field, the adecuate query would be:
+```sql
+SELECT s1.name, AVG(s2.mark) AS average_grade
+	FROM subjects AS s1
+    JOIN studies AS s2
+    ON s1.id = s2.subject_id
+    WHERE s1.field = "cs"
+    GROUP BY s1.name
+```
+
+| name | average_grade |
+|----------------------|---------------|
+| Intro to programming | 5.3889 |
+| Compilers | 6.2000 |
+| Algorithms | 6.6429 |
+| Hardware | 6.4667 |
+| Computer science | 7.4444 | 
+| Computer networks | 7.3846 |
+| Artificial Intelligence |	6. 4444 |
+| Advanced programming | 6.8000 |
 
 16. Cual es la nota media en las asignaturas de "mat" (Mathematics) entre los aprobados?
 ```sql
