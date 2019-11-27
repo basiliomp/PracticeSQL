@@ -289,7 +289,7 @@ SELECT AVG(s2.mark) AS average_grade
     ON s1.id = s2.subject_id
     WHERE s1.field = "cs";
 ```
-For the total ofsubjects in that field, the average grade is 6.5.
+For the total of subjects in that field, the average grade is 6.5.
 
 If we want to know the average grade for *each* subject in the Computer Sciences field, the adecuate query would be:
 ```sql
