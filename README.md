@@ -136,7 +136,7 @@ Another way to do that is using the following command with each table:
 ```SELECT DISTINCT (name) FROM subjects;```
 
 3. Which fields are taught?
-```SELECT DISTINCT field FROM subjects```
+```SELECT DISTINCT field FROM subjects;```
 
 4. Which subject is taught by Grace Hopper?
 ```sql
@@ -152,7 +152,7 @@ SELECT y.year, p.name
 	FROM people as p
     LEFT JOIN teaches as t ON p.id = t.teacher_id
     LEFT JOIN subjects as s ON t.subject_id = s.id
-    WHERE s.name = 'Compilers'
+    WHERE s.name = 'Compilers';
 ```
 There were Grace Hooper in 2016 and Dennis Richtie in 2017.
 
@@ -161,7 +161,7 @@ There were Grace Hooper in 2016 and Dennis Richtie in 2017.
 SELECT DISTINCT t.year, p.name
     FROM people as p
     LEFT JOIN teaches as t ON p.id = t.teacher_id
-    WHERE t.year = (SELECT MAX(year) FROM teaches)
+    WHERE t.year = (SELECT MAX(year) FROM teaches);
 ```
 
 7. How many teachers work at this centre? (Answer for last year in database)
@@ -169,7 +169,7 @@ SELECT DISTINCT t.year, p.name
 SELECT COUNT(DISTINCT p.name)
     FROM people as p
     LEFT JOIN teaches as t ON p.id = t.teacher_id
-    WHERE t.year = (SELECT MAX(year) FROM teaches)
+    WHERE t.year = (SELECT MAX(year) FROM teaches);
 ```
 10 in 2017.
 
@@ -179,7 +179,7 @@ SELECT teacher_id, COUNT(subject_id) AS n_subjects
 	FROM teaches
     WHERE year = 2017
     GROUP BY(teacher_id)
-    ORDER BY n_subjects DESC
+    ORDER BY n_subjects DESC;
 ```
 9. What is the subject with more students registered?
 ```sql
@@ -208,7 +208,7 @@ SELECT p.name, COUNT(DISTINCT s.subject_id) AS n_subjects
     ON p.id = s.student_id
     GROUP BY p.name
     ORDER BY n_subjects DESC
-    LIMIT 3
+    LIMIT 3;
 ```
 Pierre-Simon Laplace and Christiaan Huygens, both with 9 subjects.
 
@@ -242,7 +242,7 @@ SELECT p.name, SUM(s2.credits) AS n_credits
     ON s.subject_id = s2.id
     GROUP BY p.name
     ORDER BY n_credits DESC
-    LIMIT 1
+    LIMIT 1;
 ```
 Christiaan Huygens with 135 credits.
 
@@ -254,7 +254,7 @@ SELECT p.nationality
     ON p.id = t.teacher_id
     GROUP BY p.nationality
     ORDER BY p.nationality DESC
-    LIMIT 3 
+    LIMIT 3;
 ``` 
 Swiss
 
@@ -266,7 +266,7 @@ SELECT AVG(p.age) AS avg_age
     ON p.id = s1.student_id
     INNER JOIN subjects AS s2
     ON s1.subject_id = s2.id
-    WHERE s2.name = 'Data mining'
+    WHERE s2.name = 'Data mining';
 ```
 25.9 years.
 
@@ -276,30 +276,30 @@ SELECT AVG(s2.mark)
 	FROM subjects AS s1
     JOIN studies AS s2
     ON s1.id = s2.subject_id
-    WHERE s1.name = "Algebra"
+    WHERE s1.name = "Algebra";
 ```
 5.8
 
-15. Cual es la nota media en las asignaturas de "cs" (Computer science)?
+15. What is the average grade for Computer science subjects ('cs')?
 ```sql
-SELECT AVG(s2.mark)
+SELECT AVG(s2.mark) AS average_grade
 	FROM subjects AS s1
     JOIN studies AS s2
     ON s1.id = s2.subject_id
-    WHERE s1.field = "cs" 
+    WHERE s1.field = "cs";
 ```
 For the total ofsubjects in that field, the average grade is 6.5.
 
-If we want to know the average grade for *each* subject in the Computer Science field, the adecuate query would be:
+If we want to know the average grade for *each* subject in the Computer Sciences field, the adecuate query would be:
 ```sql
 SELECT s1.name, AVG(s2.mark) AS average_grade
 	FROM subjects AS s1
     JOIN studies AS s2
     ON s1.id = s2.subject_id
     WHERE s1.field = "cs"
-    GROUP BY s1.name
+    GROUP BY s1.name;
 ```
-
+With the following result:
 | name | average_grade |
 |----------------------|---------------|
 | Intro to programming | 5.3889 |
@@ -311,27 +311,70 @@ SELECT s1.name, AVG(s2.mark) AS average_grade
 | Artificial Intelligence |	6. 4444 |
 | Advanced programming | 6.8000 |
 
-16. Cual es la nota media en las asignaturas de "mat" (Mathematics) entre los aprobados?
+16. What is the average grade for "mat" (Mathematics) among those that passed?
 ```sql
-SELECT
+SELECT AVG(s2.mark) AS average_grade
+	FROM subjects AS s1
+    JOIN studies AS s2
+    	ON s1.id = s2.subject_id
+    WHERE s1.field LIKE '%mat%'
+    	AND s2.mark >= 5;
+```
+For all the students and all subjects, the average grade in matemathics subjects is 7.2.
+
+17. Who is the student with the best average grade?
+```sql
+SELECT p.name, AVG(s.mark) AS avg_grade
+	FROM people AS p
+    LEFT JOIN studies as s
+    ON p.id = s.student_id
+    GROUP BY p.id
+    ORDER BY avg_grade DESC
+    LIMIT 3;
+```
+Nicolaus Copernicus and Richard Stallman both with 8.5.
+
+18. Each credit-hour costs €30 on application, so how much money earned the learning centre each year?
+```sql
+SELECT s2.year, SUM(s1.credits) * 30 AS income
+	FROM subjects AS s1
+    JOIN studies AS s2
+    ON s1.id = s2.subject_id
+    GROUP BY s2.year;
 ```
 
-17. Quien es el/la alumno/a con mejor nota media?
+19. Which subjects are taught by one teacher only?
 ```sql
-SELECT 
-```
+SELECT s1.name, COUNT( DISTINCT t.teacher_id) AS n_teachers
+	FROM subjects AS s1
+    JOIN teaches AS t
+    ON s1.id = t.subject_id
+    JOIN studies AS s2
+    ON s1.id = s2.subject_id
+    GROUP BY s1.name
+    HAVING n_teachers < 2;
 
-18. Sabiendo que un credito vale 30 EUR, cuanto ha ganado la academia cada anyo?
-```sql
-SELECT 
+-- Another take on the problem, considering subjects over different years:
+SELECT s1.name, s2.year, COUNT( DISTINCT t.teacher_id) AS n_teachers
+	FROM subjects AS s1
+    LEFT JOIN teaches AS t
+     ON s1.id = t.subject_id
+    LEFT JOIN studies AS s2
+     ON s1.id = s2.subject_id
+    GROUP BY s2.year, s1.name
+    HAVING n_teachers < 2;
+-- The solution is still the same.
 ```
+Artificial intelligence and Gaulois theory. 
 
-19. Que asignaturas estan monopolizadas? (solo un profesor en la asignatura)
+20. If teachers were to earn a 30% of the cost of their subjects, how much should each of them be paid?
 ```sql
-SELECT 
-```
-
-20. Si los profesores ganan un 30% de los creditos que imparten, cuanto hay que pagar a cada uno?
-```sql
-SELECT 
+SELECT t.teacher_id, s2.year, SUM(s1.credits) * 30 AS annual_salary
+	FROM subjects AS s1
+    JOIN studies AS s2
+    ON s1.id = s2.subject_id
+    JOIN teaches AS t
+    ON s1.id = t.subject_id
+    GROUP BY s2.year, t.teacher_id
+    ORDER BY annual_salary DESC;
 ```
