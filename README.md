@@ -6,7 +6,7 @@
 True
 1. **Install docker**. This is feasible for MacOS, Linux distributions and Windows 10 Professional. If your system is not compatible, install additional software. For example in Windows 10 Home, install and run WAMP. Then access phpAdmin at the url:
 [http://localhost/phpmyadmin/](http://localhost/phpmyadmin/).
-"sdsdsd"
+
 2. From terminal, run the following commands:
 ```bash
 	docker pull mysql:8.0.1
@@ -23,6 +23,13 @@ True
 
 Once you shut your computer down, the docker docks will be turned off. Hence, you need to build those docks up again! For that, rerun the following commands from bash. Note that the remove command needs the container id of to run:
 
+Try calling the command ``restart`` with an explicit call to the containers' names. (You can see those containers ids with the command ``docker ps -a``.)
+```bash
+    docker restart 2ed8b04dc463
+    docker restart ff87492168ef
+```
+
+If that failed, then remove the containers and run them again.
 ```bash
 	docker ps -a	
 	docker rm 2ed8b04dc463
