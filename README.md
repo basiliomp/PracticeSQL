@@ -73,7 +73,7 @@ It contains the columns (variables):
 The following SQL commands will create each of the tables needed for our exercises:
 **Table people**
 ```sql
-CREATE TABLE people (id INT, name VARCHAR (30), gender VARCHAR (1), nacionality VARCHAR (30), age INT, PRIMARY KEY (id));
+CREATE TABLE people (id INT, name VARCHAR (30), gender VARCHAR (1), nationality VARCHAR (30), age INT, PRIMARY KEY (id));
 ```
 **Table studies**
 ```sql
@@ -256,15 +256,24 @@ Christiaan Huygens with 135 credits.
 
 12. What is the most frequent nationality among teachers?
 ```sql
-SELECT p.nationality
+SELECT p.nationality, COUNT(DISTINCT t.teacher_id) AS n
 	FROM people AS p
     INNER JOIN teaches AS t
     ON p.id = t.teacher_id
     GROUP BY p.nationality
-    ORDER BY p.nationality DESC
-    LIMIT 3;
+    ORDER BY n DESC;
 ``` 
-Swiss
+American, with 5 registers.
+
+Here may be interesting checking the list of ``teacher_id`` included ineach group. For that we can use the command at the start of the query:
+```sql
+SELECT GROUP_CONCAT(DISTINCT t.teacher_id), p.nationality, COUNT(DISTINCT t.teacher_id) AS n
+	FROM people AS p
+    INNER JOIN teaches AS t
+    ON p.id = t.teacher_id
+    GROUP BY p.nationality
+    ORDER BY n DESC;
+```
 
 13. What is the average age of people studying "Data mining"?
 ```sql
