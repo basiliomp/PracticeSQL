@@ -18,9 +18,13 @@ True
 	docker pull phpmyadmin/phpmyadmin:latest
 	docker version
 	docker run --name my-own-mysql -e MYSQL_ROOT_PASSWORD=mypass123 -d mysql:8.0.1
-	docker run --name my-own-phpmyadmin -d --link my-own-mysql:db -p 8081:80 phpmyadmin/phpmyadmin
+	docker run --name my-own-phpmyadmin -d --link my-own-mysql:db -p 8081:80 phpmyadmin/phpmyadmin # See WSL2 note below
 	docker ps -a
 ```
+
+**Note for WSL2 users**: Running Docker on the Windows Subsystem for Linux 2, consider specifying the address as `-p 0.0.0.0:8080:81`. This will make the server run by the container accessible from Windows.
+
+
 3. Access [http://localhost:8081/](http://localhost:8081/) from your browser.
 	By default, type root as username and the password you set up in step 4 of the terminal instructions (that is mypass123 in this tutorial).
 
@@ -28,9 +32,8 @@ True
 
 Once you shut your computer down, the docker docks will be turned off. Hence, you need to build those docks up again! For that, rerun the following commands from bash. Note that the remove command needs the container id of to run:
 
-Try calling the command ``restart`` with an explicit call to the containers' names. (You can see those containers ids with the command ``docker ps -a``.)
+Try calling the command ``docker restart`` with an explicit call to the containers' names. (You can see those containers ids with the command ``docker ps -a``.) Here is an example:
 ```bash
-    docker restart 2ed8b04dc463
     docker restart ff87492168ef
 ```
 
@@ -38,9 +41,8 @@ If that failed, then remove the containers and run them again.
 ```bash
 	docker ps -a	
 	docker rm 2ed8b04dc463
-	docker rm ff87492168ef
 	docker run --name my-own-mysql -e MYSQL_ROOT_PASSWORD=mypass123 -d mysql:8.0.1
-	docker run --name my-own-phpmyadmin -d --link my-own-mysql:db -p 8081:80 phpmyadmin/phpmyadmin
+	docker run --name my-own-phpmyadmin -d --link my-own-mysql:db -p 8081:80 phpmyadmin/phpmyadmin # See WSL2 note above.
 	docker ps -a
 ```
 
